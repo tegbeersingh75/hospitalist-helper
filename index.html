@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hospitalist Helper</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -429,6 +430,59 @@ Write freely — no special format needed. After hitting Extract, your notes wil
 <div class="toast" id="toast"></div>
 
 <script>
+
+const SUPABASE_URL = 'https://qevdopnwpaccvblorjlj.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_SAI92RI6TiQo_Iu8_PeRfw_DllRBVAs';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function loadFromCloud() {
+  try {
+    const { data, error } = await sb.from('pearls').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    if (data && data.length) {
+      pearls = data.map(r => ({
+        title: r.title, body: r.body,
+        taxonomy_1: r.taxonomy_1, taxonomy_2: r.taxonomy_2, taxonomy_3: r.taxonomy_3,
+        context: r.context, icd10: r.icd10, hcc: r.hcc, drg: r.drg,
+        qualifying_criteria: r.qualifying_criteria, snippet: r.snippet,
+        orders: r.orders, priority: r.priority, source: r.source, date: r.date_added,
+        db_id: r.id
+      }));
+      updateCount(); renderKB();
+      document.getElementById('emptyState') && (document.getElementById('emptyState').style.display = pearls.length ? 'none' : 'flex');
+    }
+  } catch(e) { console.log('Cloud load failed, using local:', e.message); }
+}
+
+async function saveToCloud(pearl) {
+  try {
+    const { error } = await sb.from('pearls').insert([{
+      title: pearl.title, body: pearl.body,
+      taxonomy_1: pearl.taxonomy_1, taxonomy_2: pearl.taxonomy_2, taxonomy_3: pearl.taxonomy_3,
+      context: pearl.context, icd10: pearl.icd10, hcc: pearl.hcc, drg: pearl.drg,
+      qualifying_criteria: pearl.qualifying_criteria, snippet: pearl.snippet,
+      orders: pearl.orders, priority: pearl.priority, source: pearl.source || 'Clinical Knowledge',
+      date_added: pearl.date || new Date().toISOString().slice(0,10)
+    }]);
+    if (error) throw error;
+  } catch(e) { console.log('Cloud save failed:', e.message); }
+}
+
+async function saveAllToCloud(pearlsList) {
+  try {
+    const rows = pearlsList.map(p => ({
+      title: p.title, body: p.body,
+      taxonomy_1: p.taxonomy_1, taxonomy_2: p.taxonomy_2, taxonomy_3: p.taxonomy_3,
+      context: p.context, icd10: p.icd10, hcc: p.hcc, drg: p.drg,
+      qualifying_criteria: p.qualifying_criteria, snippet: p.snippet,
+      orders: p.orders, priority: p.priority, source: p.source || 'Clinical Knowledge',
+      date_added: p.date || new Date().toISOString().slice(0,10)
+    }));
+    const { error } = await sb.from('pearls').insert(rows);
+    if (error) throw error;
+  } catch(e) { console.log('Cloud save failed:', e.message); }
+}
+
 const STORAGE_KEY = 'hh-pearls-v2';
 const APIKEY_KEY  = 'hh-apikey';
 let pearls = [];
@@ -446,6 +500,7 @@ function boot() {
   renderKB();
   const key = localStorage.getItem(APIKEY_KEY);
   if (key) document.getElementById('apikeyInput').value = key;
+  loadFromCloud();
 }
 
 function save() {
@@ -618,10 +673,12 @@ async function extractPearls() {
   loader.classList.add('show');
 
   try {
-    const res = await fetch('/.netlify/functions/claude', {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+        'x-api-key': key
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
@@ -679,6 +736,7 @@ function saveAllPearls() {
   save();
   updateCount();
   renderKB();
+  saveAllToCloud(previewPearls);
   toast(previewPearls.length + ' pearl' + (previewPearls.length===1?'':'s') + ' saved to knowledge base');
   previewPearls = [];
   document.getElementById('pearlsPreview').querySelectorAll('.preview-card').forEach(c=>c.remove());
@@ -702,10 +760,12 @@ async function generateAP() {
   loader.classList.add('show');
 
   try {
-    const res = await fetch('/.netlify/functions/claude', {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+        'x-api-key': key
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
@@ -795,6 +855,7 @@ function handleImport(e) {
         if (!pearls.find(x => x.title === p.title)) { pearls.push(p); added++; }
       });
       save(); updateCount(); renderKB();
+      saveAllToCloud(imported);
       toast('Imported ' + added + ' pearls');
     } catch(err) { toast('Import failed — check file format'); }
   };
