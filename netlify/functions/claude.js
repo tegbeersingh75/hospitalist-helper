@@ -1,32 +1,66 @@
-const fetch = require('node-fetch');
+const https = require('https');
 
 exports.handler = async (event) => {
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      },
+      body: ''
+    };
+  }
+
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    return {
+      statusCode: 500,
+      headers: { 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({ error: 'API key not configured' })
+    };
+  }
+
+  return new Promise((resolve) => {
+    const bodyData = event.body;
+    const options = {
+      hostname: 'api.anthropic.com',
+      path: '/v1/messages',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'anthropic-version': '2023-06-01',
-        'x-api-key': process.env.ANTHROPIC_API_KEY
-      },
-      body: event.body
+        'x-api-key': apiKey,
+        'Content-Length': Buffer.byteLength(bodyData)
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        resolve({
+          statusCode: 200,
+          headers: { 'Access-Control-Allow-Origin': '*' },
+          body: data
+        });
+      });
     });
 
-    const data = await response.json();
-    return {
-      statusCode: 200,
-      headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify(data)
-    };
-  } catch (err) {
-    return {
-      statusCode: 500,
-      headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ error: err.message })
-    };
-  }
+    req.on('error', (err) => {
+      resolve({
+        statusCode: 500,
+        headers: { 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify({ error: err.message })
+      });
+    });
+
+    req.write(bodyData);
+    req.end();
+  });
 };
