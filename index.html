@@ -664,9 +664,6 @@ async function extractPearls() {
   const notes = document.getElementById('captureNotes').value.trim();
   if (!notes) { toast('Add some notes first'); return; }
 
-  const key = getApiKey();
-  if (!key) { showApiKeyModal(); toast('Set your API key first'); return; }
-
   const btn = document.getElementById('extractBtn');
   const loader = document.getElementById('extractLoader');
   btn.style.display = 'none';
@@ -677,8 +674,6 @@ async function extractPearls() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01',
-        'x-api-key': key
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
@@ -751,9 +746,6 @@ async function generateAP() {
   const problems  = document.getElementById('apProblems').value.trim();
   if (!problems) { toast('Add at least one problem'); return; }
 
-  const key = getApiKey();
-  if (!key) { showApiKeyModal(); toast('Set your API key first'); return; }
-
   const btn = document.getElementById('apBtn');
   const loader = document.getElementById('apLoader');
   btn.style.display = 'none';
@@ -764,8 +756,6 @@ async function generateAP() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01',
-        'x-api-key': key
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
