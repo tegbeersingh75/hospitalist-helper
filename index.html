@@ -618,7 +618,7 @@ async function extractPearls() {
   loader.classList.add('show');
 
   try {
-    const res = await fetch('https://hospitalist-helper-api.onrender.com/api/claude', {
+    const res = await fetch('/.netlify/functions/claude', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -702,7 +702,7 @@ async function generateAP() {
   loader.classList.add('show');
 
   try {
-    const res = await fetch('https://hospitalist-helper-api.onrender.com/api/claude', {
+    const res = await fetch('/.netlify/functions/claude', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
