@@ -437,7 +437,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function loadFromCloud() {
   try {
-    const { data, error } = await sb.from('pearls').select('*').order('created_at', { ascending: false });
+    const { data, error } = await sb.from('pearls').select('*').order('date_added', { ascending: false });
     if (error) throw error;
     if (data && data.length) {
       pearls = data.map(r => ({
