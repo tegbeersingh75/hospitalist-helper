@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospitalist Helper</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f5f0;
+  --surface: #ffffff;
+  --surface2: #f9f9f6;
+  --border: #e5e4df;
+  --border2: #d0cfc8;
+  --text: #1a1a18;
+  --text2: #5a5a54;
+  --text3: #9a9a92;
+  --accent: #1a5cff;
+  --accent-bg: #eef3ff;
+  --green: #1a7a4a;
+  --green-bg: #edf7f2;
+  --red: #c0392b;
+  --red-bg: #fef0ee;
+  --amber: #92600a;
+  --amber-bg: #fef8ee;
+  --purple: #6b3fa0;
+  --purple-bg: #f4eeff;
+  --teal: #0e7490;
+  --teal-bg: #ecfbff;
+  --navy: #1a1a2e;
+  --font: 'DM Sans', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+  --font-mono: 'DM Mono', monospace;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; -webkit-font-smoothing: antialiased; }
+
+/* ── Layout ── */
+.shell { display: grid; grid-template-columns: 220px 1fr; grid-template-rows: 56px 1fr; height: 100vh; }
+.topbar { grid-column: 1/-1; display: flex; align-items: center; padding: 0 20px; background: var(--surface); border-bottom: 1px solid var(--border); gap: 12px; box-shadow: var(--shadow); z-index: 10; }
+.logo { font-family: var(--font-serif); font-size: 20px; color: var(--text); letter-spacing: -0.01em; }
+.logo span { color: var(--accent); font-style: italic; }
+.top-badge { font-size: 10px; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 20px; font-weight: 500; border: 1px solid rgba(26,92,255,0.15); }
+.top-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.pearl-total { font-size: 12px; color: var(--text3); font-family: var(--font-mono); }
+
+/* ── Sidebar ── */
+.sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 16px 0; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+.nav-section { padding: 8px 16px 4px; font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 16px; cursor: pointer; color: var(--text2); font-size: 13px; font-weight: 400; border-left: 2px solid transparent; transition: all 0.12s; }
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: var(--accent-bg); color: var(--accent); border-left-color: var(--accent); font-weight: 500; }
+.nav-icon { font-size: 15px; width: 18px; text-align: center; }
+.nav-divider { height: 1px; background: var(--border); margin: 8px 16px; }
+.filter-section { padding: 8px 12px; }
+.filter-label { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); padding: 0 4px; margin-bottom: 6px; }
+.filter-chip { display: block; width: 100%; text-align: left; padding: 5px 8px; border-radius: var(--radius-sm); border: none; background: transparent; font-family: var(--font); font-size: 12px; color: var(--text2); cursor: pointer; transition: all 0.1s; }
+.filter-chip:hover { background: var(--surface2); color: var(--text); }
+.filter-chip.active { background: var(--accent-bg); color: var(--accent); font-weight: 500; }
+
+/* ── Main ── */
+.main { overflow: hidden; display: flex; flex-direction: column; }
+.page { display: none; flex-direction: column; height: 100%; overflow: hidden; }
+.page.active { display: flex; }
+
+/* ── Page headers ── */
+.page-header { flex-shrink: 0; padding: 20px 24px 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
+.page-title { font-family: var(--font-serif); font-size: 22px; color: var(--text); margin-bottom: 2px; }
+.page-sub { font-size: 12px; color: var(--text3); }
+
+/* ── Buttons ── */
+.btn { padding: 8px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--surface); font-family: var(--font); font-size: 13px; font-weight: 500; cursor: pointer; color: var(--text); transition: all 0.12s; }
+.btn:hover { background: var(--surface2); border-color: var(--border2); }
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover { background: #1450e0; border-color: #1450e0; }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-sm { padding: 5px 11px; font-size: 12px; }
+.btn-ghost { border-color: transparent; background: transparent; }
+.btn-ghost:hover { background: var(--surface2); border-color: var(--border); }
+
+/* ── Inputs ── */
+input[type=text], textarea, select {
+  font-family: var(--font); font-size: 13px; color: var(--text);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); outline: none;
+  transition: border-color 0.12s;
+}
+input[type=text]:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,92,255,0.08); }
+input[type=text]::placeholder, textarea::placeholder { color: var(--text3); }
+
+/* ── Search bar ── */
+.search-wrap { padding: 14px 24px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.search-input { flex: 1; padding: 8px 12px; }
+
+/* ── Pearl grid ── */
+.pearl-scroll { flex: 1; overflow-y: auto; padding: 16px 24px; }
+.pearl-scroll::-webkit-scrollbar { width: 5px; }
+.pearl-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+.pearl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+.pcard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow); border-left: 3px solid transparent; }
+.pcard:hover { border-color: var(--border2); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.pcard.ctx-mgmt { border-left-color: var(--accent); }
+.pcard.ctx-dx { border-left-color: var(--amber); }
+.pcard.ctx-trap { border-left-color: var(--purple); }
+.pcard.ctx-contra { border-left-color: #e91e8c; }
+.pcard.ctx-monitor { border-left-color: var(--green); }
+.pcard.ctx-pharm { border-left-color: var(--teal); }
+.pcard-bc { font-size: 10px; color: var(--text3); font-family: var(--font-mono); margin-bottom: 6px; }
+.pcard-title { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.4; margin-bottom: 8px; }
+.pcard-body { font-size: 12px; color: var(--text2); line-height: 1.6; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.badges { display: flex; gap: 5px; flex-wrap: wrap; }
+.badge { font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 500; white-space: nowrap; }
+.b-icd { background: var(--green-bg); color: var(--green); font-family: var(--font-mono); }
+.b-hi { background: var(--red-bg); color: var(--red); }
+.b-mgmt { background: var(--accent-bg); color: var(--accent); }
+.b-dx { background: var(--amber-bg); color: var(--amber); }
+.b-trap { background: var(--purple-bg); color: var(--purple); }
+.b-contra { background: #ffeef6; color: #c2185b; }
+.b-monitor { background: var(--green-bg); color: var(--green); }
+.b-pharm { background: var(--teal-bg); color: var(--teal); }
+.b-src { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
+
+/* ── Modal / Detail panel ── */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
+.overlay.open { display: flex; }
+.modal { background: var(--surface); border-radius: var(--radius); width: 100%; max-width: 680px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+.modal-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
+.modal-title { font-family: var(--font-serif); font-size: 20px; line-height: 1.3; max-width: 540px; }
+.modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text3); padding: 0 4px; flex-shrink: 0; }
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 18px; }
+.detail-section { }
+.detail-label { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+.detail-text { font-size: 13px; color: var(--text2); line-height: 1.7; }
+.snippet-box { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 12px; font-family: var(--font-mono); color: var(--text); line-height: 1.8; position: relative; }
+.copy-btn { position: absolute; top: 8px; right: 8px; padding: 3px 9px; border-radius: 4px; border: 1px solid var(--border2); background: var(--surface); font-size: 10px; font-family: var(--font); cursor: pointer; color: var(--text2); transition: all 0.12s; }
+.copy-btn:hover { background: var(--green-bg); color: var(--green); border-color: var(--green); }
+.billing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.billing-cell { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; }
+.billing-cell-label { font-size: 10px; color: var(--text3); font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.06em; }
+.billing-cell-val { font-size: 13px; font-weight: 500; color: var(--text); font-family: var(--font-mono); }
+.orders-text { font-size: 12px; color: var(--text2); line-height: 1.9; }
+
+/* ── Capture page ── */
+.capture-layout { display: grid; grid-template-columns: 1fr 1fr; flex: 1; overflow: hidden; }
+.capture-left { border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+.capture-right { display: flex; flex-direction: column; overflow: hidden; }
+.cap-header { flex-shrink: 0; padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; background: var(--surface); }
+.cap-label { font-size: 12px; font-weight: 500; color: var(--text2); }
+.cap-textarea { flex: 1; width: 100%; padding: 16px 20px; border: none; outline: none; resize: none; font-size: 14px; line-height: 1.8; color: var(--text); background: transparent; font-family: var(--font); }
+.cap-footer { flex-shrink: 0; padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: center; background: var(--surface); }
+.cap-source { padding: 6px 10px; border-radius: var(--radius-sm); font-size: 12px; }
+.pearls-preview { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.preview-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 8px; color: var(--text3); font-size: 13px; text-align: center; padding: 32px; }
+.preview-empty-icon { font-size: 32px; margin-bottom: 4px; opacity: 0.4; }
+.preview-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
+.preview-card-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+.preview-card-body { font-size: 12px; color: var(--text2); line-height: 1.6; margin-bottom: 8px; }
+.loader { display: none; align-items: center; gap: 8px; font-size: 12px; color: var(--text3); }
+.loader.show { display: flex; }
+.spinner { width: 14px; height: 14px; border: 2px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── A&P Builder ── */
+.ap-layout { display: grid; grid-template-columns: 1fr 1fr; flex: 1; overflow: hidden; }
+.ap-left { border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+.ap-right { display: flex; flex-direction: column; overflow: hidden; background: var(--surface2); }
+.ap-section { flex-shrink: 0; padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--surface); }
+.ap-section-label { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; }
+.ap-input { width: 100%; padding: 8px 12px; }
+.ap-textarea { flex: 1; width: 100%; padding: 16px 20px; border: none; outline: none; resize: none; font-size: 13px; line-height: 1.85; color: var(--text); background: transparent; font-family: var(--font); min-height: 0; }
+.ap-footer { flex-shrink: 0; padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; background: var(--surface); }
+.ap-output-header { flex-shrink: 0; padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--surface); }
+.ap-output-label { font-size: 12px; font-weight: 500; color: var(--text2); }
+.ap-output-scroll { flex: 1; overflow-y: auto; padding: 0; }
+.ap-output-text { padding: 20px; font-size: 13px; font-family: var(--font-mono); line-height: 1.9; color: var(--text); white-space: pre-wrap; word-break: break-word; }
+.ap-output-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 8px; color: var(--text3); font-size: 13px; text-align: center; padding: 32px; }
+.ap-output-empty-icon { font-size: 32px; opacity: 0.3; margin-bottom: 4px; }
+
+/* ── Empty state ── */
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 10px; color: var(--text3); text-align: center; padding: 40px; }
+.empty-title { font-family: var(--font-serif); font-size: 22px; color: var(--text2); font-style: italic; }
+.empty-sub { font-size: 13px; line-height: 1.8; max-width: 300px; }
+
+/* ── Toast ── */
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: #fff; padding: 10px 18px; border-radius: var(--radius); font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 999; box-shadow: var(--shadow-md); }
+.toast.show { opacity: 1; }
+
+/* ── API key modal ── */
+.apikey-modal { background: var(--surface); border-radius: var(--radius); width: 100%; max-width: 480px; padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+.apikey-title { font-family: var(--font-serif); font-size: 20px; margin-bottom: 8px; }
+.apikey-sub { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 18px; }
+.apikey-input { width: 100%; padding: 9px 12px; font-family: var(--font-mono); font-size: 13px; margin-bottom: 12px; }
+.apikey-note { font-size: 11px; color: var(--text3); line-height: 1.6; }
+.apikey-note a { color: var(--accent); }
+
+/* ── Import banner ── */
+.import-bar { flex-shrink: 0; padding: 8px 24px; background: var(--amber-bg); border-bottom: 1px solid #f0d080; display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--amber); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="logo">Hospitalist <span>Helper</span></div>
+    <div class="top-badge">Personal</div>
+    <div class="top-right">
+      <span class="pearl-total" id="totalCount">0 pearls saved</span>
+      <button class="btn btn-sm" onclick="exportJSON()">Export JSON</button>
+      <button class="btn btn-sm" onclick="document.getElementById('importFile').click()">Import JSON</button>
+      <button class="btn btn-sm btn-ghost" onclick="showApiKeyModal()">⚙ API Key</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="nav-section">Workspace</div>
+    <div class="nav-item active" onclick="showPage('kb')" data-page="kb">
+      <span class="nav-icon">⬡</span> Knowledge Base
+    </div>
+    <div class="nav-item" onclick="showPage('capture')" data-page="capture">
+      <span class="nav-icon">✎</span> Capture Notes
+    </div>
+    <div class="nav-item" onclick="showPage('ap')" data-page="ap">
+      <span class="nav-icon">◈</span> A&P Builder
+    </div>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section">Filter by System</div>
+    <div class="filter-section">
+      <button class="filter-chip active" onclick="setSystemFilter(this,'all')">All systems</button>
+      <button class="filter-chip" onclick="setSystemFilter(this,'Cardiovascular')">Cardiovascular</button>
+      <button class="filter-chip" onclick="setSystemFilter(this,'Pulmonary')">Pulmonary</button>
+      <button class="filter-chip" onclick="setSystemFilter(this,'Renal')">Renal</button>
+      <button class="filter-chip" onclick="setSystemFilter(this,'Infectious Disease')">Infectious Disease</button>
+      <button class="filter-chip" onclick="setSystemFilter(this,'Endocrine & Metabolism')">Endocrine</button>
+      <button class="filter-chip" onclick="setSystemFilter(this,'Heme-Onc')">Heme-Onc</button>
+      <button class="filter-chip" onclick="setSystemFilter(this,'GI')">GI</button>
+      <button class="filter-chip" onclick="setSystemFilter(this,'Neurology')">Neurology</button>
+    </div>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section">Filter by Context</div>
+    <div class="filter-section">
+      <button class="filter-chip active" onclick="setContextFilter(this,'all')">All contexts</button>
+      <button class="filter-chip" onclick="setContextFilter(this,'Management')">Management</button>
+      <button class="filter-chip" onclick="setContextFilter(this,'Diagnosis')">Diagnosis</button>
+      <button class="filter-chip" onclick="setContextFilter(this,'Boards Trap')">Boards Trap</button>
+      <button class="filter-chip" onclick="setContextFilter(this,'Contraindication')">Contraindication</button>
+      <button class="filter-chip" onclick="setContextFilter(this,'Monitoring')">Monitoring</button>
+      <button class="filter-chip" onclick="setContextFilter(this,'Pharmacotherapy')">Pharmacotherapy</button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main">
+
+    <!-- Knowledge Base page -->
+    <div class="page active" id="page-kb">
+      <div class="page-header">
+        <div class="page-title">Knowledge Base</div>
+        <div class="page-sub">Your synthesized clinical knowledge — searchable, filterable, always available</div>
+      </div>
+      <div class="search-wrap">
+        <input type="text" class="search-input" id="kbSearch" placeholder="Search by diagnosis, ICD-10, keyword, system..." oninput="renderKB()">
+        <select id="priorityFilter" class="btn btn-sm" onchange="renderKB()" style="padding:5px 10px;">
+          <option value="all">All priority</option>
+          <option value="high">High yield only</option>
+        </select>
+      </div>
+      <div class="pearl-scroll" id="kbScroll">
+        <div class="empty-state" id="kbEmpty">
+          <div class="empty-title">Nothing here yet</div>
+          <div class="empty-sub">Go to Capture Notes to add your first pearls. They'll save automatically and appear here.</div>
+        </div>
+        <div class="pearl-grid" id="pearlGrid"></div>
+      </div>
+    </div>
+
+    <!-- Capture page -->
+    <div class="page" id="page-capture">
+      <div class="page-header">
+        <div class="page-title">Capture Notes</div>
+        <div class="page-sub">Paste your clinical notes — pearls are extracted and saved to your knowledge base</div>
+      </div>
+      <div class="capture-layout">
+        <div class="capture-left">
+          <div class="cap-header">
+            <span class="cap-label">Your notes</span>
+          </div>
+          <textarea class="cap-textarea" id="captureNotes" placeholder="Write or paste your clinical notes here...
+
+Write freely — no special format needed. After hitting Extract, your notes will be synthesized into structured clinical pearls and saved to your knowledge base."></textarea>
+          <div class="cap-footer">
+            <button class="btn btn-primary" id="extractBtn" onclick="extractPearls()">Extract pearls</button>
+            <div class="loader" id="extractLoader"><div class="spinner"></div> Extracting...</div>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('captureNotes').value=''">Clear</button>
+          </div>
+        </div>
+        <div class="capture-right">
+          <div class="cap-header">
+            <span class="cap-label">Extracted pearls</span>
+            <button class="btn btn-sm btn-primary" id="saveAllBtn" style="display:none;margin-left:auto;" onclick="saveAllPearls()">Save all to knowledge base</button>
+          </div>
+          <div class="pearls-preview" id="pearlsPreview">
+            <div class="preview-empty" id="previewEmpty">
+              <div class="preview-empty-icon">◈</div>
+              <div>Pearls will appear here after extraction</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- A&P Builder page -->
+    <div class="page" id="page-ap">
+      <div class="page-header">
+        <div class="page-title">Assessment & Plan Builder</div>
+        <div class="page-sub">Enter your patient's problems — get a structured A&P with billing flags</div>
+      </div>
+      <div class="ap-layout">
+        <div class="ap-left">
+          <div class="ap-section">
+            <div class="ap-section-label">Patient one-liner</div>
+            <input type="text" class="ap-input" id="apOneliner" placeholder="e.g. 67M with HTN, DM2, HFrEF presenting with dyspnea and weight gain...">
+          </div>
+          <div class="ap-section" style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding-bottom:0;">
+            <div class="ap-section-label">Problem list + relevant details</div>
+            <textarea class="ap-textarea" id="apProblems" placeholder="List each problem with relevant clinical details:
+
+1. Acute decompensated HF — BNP 4200, bilateral crackles, 3+ pitting edema, weight up 8 lbs
+2. AKI — baseline Cr 1.1, now 2.3, decreased UO
+3. Afib with RVR — HR 130s, not on anticoagulation, CHA2DS2-VASc 4
+4. Hyponatremia — Na 129, euvolemic on exam, hypothyroid history"></textarea>
+          </div>
+          <div class="ap-footer">
+            <button class="btn btn-primary" id="apBtn" onclick="generateAP()">Generate A&P</button>
+            <div class="loader" id="apLoader"><div class="spinner"></div> Generating...</div>
+            <button class="btn btn-ghost btn-sm" onclick="clearAP()">Clear</button>
+          </div>
+        </div>
+        <div class="ap-right">
+          <div class="ap-output-header">
+            <span class="ap-output-label">Generated Assessment & Plan</span>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-sm" id="copyApBtn" onclick="copyAP()" style="display:none;">Copy to clipboard</button>
+            </div>
+          </div>
+          <div class="ap-output-scroll">
+            <div class="ap-output-empty" id="apEmpty">
+              <div class="ap-output-empty-icon">◈</div>
+              <div>Your structured A&P will appear here</div>
+              <div style="font-size:11px;margin-top:4px;line-height:1.7;">Each problem includes assessment, plan,<br>ICD-10 code, and billing documentation flags</div>
+            </div>
+            <div class="ap-output-text" id="apOutput" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Pearl detail modal -->
+<div class="overlay" id="pearlOverlay" onclick="closeModal(event)">
+  <div class="modal" id="pearlModal">
+    <div class="modal-header">
+      <div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-bottom:6px;" id="modalBC"></div>
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="badges" style="margin-top:10px;" id="modalBadges"></div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('pearlOverlay').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-section">
+        <div class="detail-label">Clinical Pearl</div>
+        <div class="detail-text" id="modalBody"></div>
+      </div>
+      <div class="detail-section" id="modalCriteriaSection">
+        <div class="detail-label">Qualifying Criteria — what insurers require</div>
+        <div class="detail-text" id="modalCriteria"></div>
+      </div>
+      <div class="detail-section" id="modalSnippetSection">
+        <div class="detail-label">Paste-Ready Epic Snippet</div>
+        <div class="snippet-box" id="modalSnippet">
+          <button class="copy-btn" onclick="copySnippet()">copy</button>
+          <span id="modalSnippetText"></span>
+        </div>
+      </div>
+      <div class="detail-section" id="modalBillingSection">
+        <div class="detail-label">Billing Reference</div>
+        <div class="billing-grid">
+          <div class="billing-cell"><div class="billing-cell-label">ICD-10</div><div class="billing-cell-val" id="modalIcd"></div></div>
+          <div class="billing-cell"><div class="billing-cell-label">HCC Flag</div><div class="billing-cell-val" id="modalHcc"></div></div>
+          <div class="billing-cell"><div class="billing-cell-label">DRG</div><div class="billing-cell-val" id="modalDrg"></div></div>
+        </div>
+      </div>
+      <div class="detail-section" id="modalOrdersSection">
+        <div class="detail-label">Suggested Orders / Workup</div>
+        <div class="orders-text" id="modalOrders"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- API Key modal -->
+<div class="overlay" id="apikeyOverlay">
+  <div class="apikey-modal">
+    <div class="apikey-title">Set your API key</div>
+    <div class="apikey-sub">Your Anthropic API key is stored locally in your browser and never sent anywhere except directly to Anthropic's API. Required for pearl extraction and A&P generation.</div>
+    <input type="password" class="apikey-input" id="apikeyInput" placeholder="sk-ant-...">
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <button class="btn btn-primary" onclick="saveApiKey()">Save key</button>
+      <button class="btn" onclick="document.getElementById('apikeyOverlay').classList.remove('open')">Cancel</button>
+    </div>
+    <div class="apikey-note">Get your key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys → Create Key. Usage is billed at standard Anthropic rates (~$0.003 per extraction).</div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'hh-pearls-v2';
+const APIKEY_KEY  = 'hh-apikey';
+let pearls = [];
+let sysFilter = 'all';
+let ctxFilter = 'all';
+let previewPearls = [];
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+function boot() {
+  try {
+    const d = localStorage.getItem(STORAGE_KEY);
+    if (d) pearls = JSON.parse(d) || [];
+  } catch(e) { pearls = []; }
+  updateCount();
+  renderKB();
+  const key = localStorage.getItem(APIKEY_KEY);
+  if (key) document.getElementById('apikeyInput').value = key;
+}
+
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(pearls)); } catch(e) {}
+}
+
+function updateCount() {
+  document.getElementById('totalCount').textContent = pearls.length + (pearls.length===1?' pearl':' pearls') + ' saved';
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item[data-page]').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelector('.nav-item[data-page="' + page + '"]').classList.add('active');
+}
+
+// ── Filters ───────────────────────────────────────────────────────────────────
+function setSystemFilter(el, val) {
+  sysFilter = val;
+  document.querySelectorAll('.filter-section .filter-chip').forEach(c => {
+    if (c.onclick.toString().includes('setSystemFilter')) c.classList.remove('active');
+  });
+  el.classList.add('active');
+  renderKB();
+  showPage('kb');
+}
+
+function setContextFilter(el, val) {
+  ctxFilter = val;
+  document.querySelectorAll('.filter-section .filter-chip').forEach(c => {
+    if (c.onclick.toString().includes('setContextFilter')) c.classList.remove('active');
+  });
+  el.classList.add('active');
+  renderKB();
+  showPage('kb');
+}
+
+// ── Knowledge Base ────────────────────────────────────────────────────────────
+function renderKB() {
+  const query    = (document.getElementById('kbSearch').value || '').toLowerCase();
+  const priority = document.getElementById('priorityFilter').value;
+  const grid     = document.getElementById('pearlGrid');
+  const empty    = document.getElementById('kbEmpty');
+
+  let filtered = pearls.filter(p => {
+    if (sysFilter !== 'all' && p.taxonomy_1 !== sysFilter) return false;
+    if (ctxFilter !== 'all' && p.context !== ctxFilter) return false;
+    if (priority === 'high' && p.priority !== 'high') return false;
+    if (query) {
+      const hay = [p.title,p.body,p.icd10,p.taxonomy_1,p.taxonomy_2,p.taxonomy_3,p.context].join(' ').toLowerCase();
+      if (!hay.includes(query)) return false;
+    }
+    return true;
+  });
+
+  grid.innerHTML = '';
+  if (!pearls.length) { empty.style.display='flex'; return; }
+  empty.style.display = 'none';
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3);font-size:13px;">No pearls match your search.</div>';
+    return;
+  }
+
+  [...filtered].reverse().forEach(p => grid.appendChild(buildCard(p)));
+}
+
+function ctxClass(ctx) {
+  const m = { 'Management':'ctx-mgmt','Diagnosis':'ctx-dx','Boards Trap':'ctx-trap','Contraindication':'ctx-contra','Monitoring':'ctx-monitor','Pharmacotherapy':'ctx-pharm' };
+  return m[ctx] || '';
+}
+
+function ctxBadgeClass(ctx) {
+  const m = { 'Management':'b-mgmt','Diagnosis':'b-dx','Boards Trap':'b-trap','Contraindication':'b-contra','Monitoring':'b-monitor','Pharmacotherapy':'b-pharm' };
+  return m[ctx] || 'b-src';
+}
+
+function buildCard(p) {
+  const card = document.createElement('div');
+  card.className = 'pcard ' + ctxClass(p.context);
+  const bc = [p.taxonomy_1, p.taxonomy_2, p.taxonomy_3].filter(Boolean).join(' › ');
+  card.innerHTML = `
+    <div class="pcard-bc">${bc}</div>
+    <div class="pcard-title">${p.title||''}</div>
+    <div class="pcard-body">${p.body||''}</div>
+    <div class="badges">
+      ${p.icd10?`<span class="badge b-icd">${p.icd10}</span>`:''}
+      ${p.context?`<span class="badge ${ctxBadgeClass(p.context)}">${p.context}</span>`:''}
+      ${p.priority==='high'?'<span class="badge b-hi">high yield</span>':''}
+    </div>`;
+  card.onclick = () => openModal(p);
+  return card;
+}
+
+// ── Modal ─────────────────────────────────────────────────────────────────────
+let currentSnippet = '';
+function openModal(p) {
+  const bc = [p.taxonomy_1,p.taxonomy_2,p.taxonomy_3].filter(Boolean).join(' › ');
+  document.getElementById('modalBC').textContent = bc;
+  document.getElementById('modalTitle').textContent = p.title || '';
+  document.getElementById('modalBody').textContent = p.body || '';
+  document.getElementById('modalIcd').textContent = p.icd10 || '—';
+  document.getElementById('modalHcc').textContent = p.hcc || '—';
+  document.getElementById('modalDrg').textContent = p.drg || '—';
+
+  const badges = document.getElementById('modalBadges');
+  badges.innerHTML = `
+    ${p.icd10?`<span class="badge b-icd">${p.icd10}</span>`:''}
+    ${p.context?`<span class="badge ${ctxBadgeClass(p.context)}">${p.context}</span>`:''}
+    ${p.priority==='high'?'<span class="badge b-hi">high yield</span>':''}
+  `;
+
+  document.getElementById('modalCriteria').textContent = p.qualifying_criteria || '';
+  document.getElementById('modalCriteriaSection').style.display = p.qualifying_criteria ? '' : 'none';
+
+  currentSnippet = p.snippet || '';
+  document.getElementById('modalSnippetText').textContent = currentSnippet;
+  document.getElementById('modalSnippetSection').style.display = p.snippet ? '' : 'none';
+
+  const orders = p.orders || '';
+  document.getElementById('modalOrders').innerHTML = orders.split(',').map(o=>`• ${o.trim()}`).join('<br>');
+  document.getElementById('modalOrdersSection').style.display = orders ? '' : 'none';
+
+  document.getElementById('pearlOverlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('pearlOverlay')) {
+    document.getElementById('pearlOverlay').classList.remove('open');
+  }
+}
+
+function copySnippet() {
+  navigator.clipboard.writeText(currentSnippet).then(() => {
+    document.querySelector('.copy-btn').textContent = 'copied!';
+    setTimeout(() => document.querySelector('.copy-btn').textContent = 'copy', 2000);
+  }).catch(() => fallbackCopy(currentSnippet));
+}
+
+// ── API key ───────────────────────────────────────────────────────────────────
+function showApiKeyModal() {
+  document.getElementById('apikeyOverlay').classList.add('open');
+}
+
+function saveApiKey() {
+  const key = document.getElementById('apikeyInput').value.trim();
+  if (!key) { toast('Please enter a key'); return; }
+  localStorage.setItem(APIKEY_KEY, key);
+  document.getElementById('apikeyOverlay').classList.remove('open');
+  toast('API key saved');
+}
+
+function getApiKey() {
+  return localStorage.getItem(APIKEY_KEY) || '';
+}
+
+// ── Capture ───────────────────────────────────────────────────────────────────
+async function extractPearls() {
+  const notes = document.getElementById('captureNotes').value.trim();
+  if (!notes) { toast('Add some notes first'); return; }
+
+  const key = getApiKey();
+  if (!key) { showApiKeyModal(); toast('Set your API key first'); return; }
+
+  const btn = document.getElementById('extractBtn');
+  const loader = document.getElementById('extractLoader');
+  btn.style.display = 'none';
+  loader.classList.add('show');
+
+  try {
+    const res = await fetch('https://hospitalist-helper-api.onrender.com/api/claude', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        system: `You are a clinical knowledge organizer for an internal medicine hospitalist. Extract clinical pearls from notes and write them as the physician's own synthesized clinical knowledge. Return ONLY a raw JSON array, no markdown, no backticks, starting with [ and ending with ]. Each object must have: "title" (short memorable title), "body" (2-4 sentence synthesized pearl), "taxonomy_1" (System e.g. Cardiovascular), "taxonomy_2" (Category e.g. Heart Failure), "taxonomy_3" (Subcategory e.g. Acute Decompensated HF), "context" (one of: Diagnosis, Management, Monitoring, Boards Trap, Contraindication, Pharmacotherapy), "icd10" (most specific ICD-10 code), "hcc" (Yes — HCC X or No), "drg" (DRG info), "qualifying_criteria" (2-3 sentences on what Medicare/MA/commercial payers require to accept this code), "snippet" (paste-ready Epic note language with [brackets] for values), "orders" (comma-separated suggested orders), "priority" (high or normal), "date" (today YYYY-MM-DD). Extract 1-6 pearls.`,
+        messages: [{ role: 'user', content: notes }]
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || 'API error ' + res.status);
+    }
+
+    const data = await res.json();
+    const raw = (data.content||[]).map(i=>i.text||'').join('').trim();
+    previewPearls = parseJSON(raw);
+    if (!previewPearls || !previewPearls.length) throw new Error('Could not parse response');
+
+    renderPreview();
+    document.getElementById('saveAllBtn').style.display = '';
+    document.getElementById('previewEmpty').style.display = 'none';
+
+  } catch(e) {
+    toast('Error: ' + e.message);
+  }
+
+  btn.style.display = '';
+  loader.classList.remove('show');
+}
+
+function renderPreview() {
+  const container = document.getElementById('pearlsPreview');
+  container.querySelectorAll('.preview-card').forEach(c=>c.remove());
+  previewPearls.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'preview-card';
+    const bc = [p.taxonomy_1,p.taxonomy_2,p.taxonomy_3].filter(Boolean).join(' › ');
+    card.innerHTML = `
+      <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-bottom:4px;">${bc}</div>
+      <div class="preview-card-title">${p.title||''}</div>
+      <div class="preview-card-body">${p.body||''}</div>
+      <div class="badges">
+        ${p.icd10?`<span class="badge b-icd">${p.icd10}</span>`:''}
+        ${p.context?`<span class="badge ${ctxBadgeClass(p.context)}">${p.context}</span>`:''}
+        ${p.priority==='high'?'<span class="badge b-hi">high yield</span>':''}
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+function saveAllPearls() {
+  if (!previewPearls.length) return;
+  previewPearls.forEach(p => pearls.push(p));
+  save();
+  updateCount();
+  renderKB();
+  toast(previewPearls.length + ' pearl' + (previewPearls.length===1?'':'s') + ' saved to knowledge base');
+  previewPearls = [];
+  document.getElementById('pearlsPreview').querySelectorAll('.preview-card').forEach(c=>c.remove());
+  document.getElementById('previewEmpty').style.display = 'flex';
+  document.getElementById('saveAllBtn').style.display = 'none';
+  document.getElementById('captureNotes').value = '';
+}
+
+// ── A&P Builder ───────────────────────────────────────────────────────────────
+async function generateAP() {
+  const oneliner  = document.getElementById('apOneliner').value.trim();
+  const problems  = document.getElementById('apProblems').value.trim();
+  if (!problems) { toast('Add at least one problem'); return; }
+
+  const key = getApiKey();
+  if (!key) { showApiKeyModal(); toast('Set your API key first'); return; }
+
+  const btn = document.getElementById('apBtn');
+  const loader = document.getElementById('apLoader');
+  btn.style.display = 'none';
+  loader.classList.add('show');
+
+  try {
+    const res = await fetch('https://hospitalist-helper-api.onrender.com/api/claude', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 3000,
+        system: `You are an expert internal medicine hospitalist assistant. Generate a structured Assessment and Plan for the given patient. For each problem use this exact format:
+
+PROBLEM #: [Problem Name] — ICD-10: [code]
+
+Assessment: [1-2 sentences synthesizing the clinical picture for this problem]
+
+Plan:
+• [Action item 1]
+• [Action item 2]
+• [Action item 3...]
+
+⚑ Billing note: [One sentence — what must appear in the physician note to capture the correct ICD-10 and avoid denial. Be specific — mention exact values, terms, or criteria required.]
+
+---
+
+After all problems add:
+
+DISCHARGE CONSIDERATIONS:
+• [Criterion 1 that must be met before safe discharge]
+• [Criterion 2...]
+
+Be concise, practical, and structured. Think like a senior academic hospitalist.`,
+        messages: [{
+          role: 'user',
+          content: (oneliner ? 'Patient: ' + oneliner + '\n\n' : '') + 'Problems:\n' + problems
+        }]
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || 'API error ' + res.status);
+    }
+
+    const data = await res.json();
+    const text = (data.content||[]).map(i=>i.text||'').join('').trim();
+    document.getElementById('apOutput').textContent = text;
+    document.getElementById('apOutput').style.display = '';
+    document.getElementById('apEmpty').style.display = 'none';
+    document.getElementById('copyApBtn').style.display = '';
+
+  } catch(e) {
+    toast('Error: ' + e.message);
+  }
+
+  btn.style.display = '';
+  loader.classList.remove('show');
+}
+
+function clearAP() {
+  document.getElementById('apOneliner').value = '';
+  document.getElementById('apProblems').value = '';
+  document.getElementById('apOutput').style.display = 'none';
+  document.getElementById('apEmpty').style.display = 'flex';
+  document.getElementById('copyApBtn').style.display = 'none';
+}
+
+function copyAP() {
+  const text = document.getElementById('apOutput').textContent;
+  navigator.clipboard.writeText(text).then(() => toast('A&P copied to clipboard')).catch(() => fallbackCopy(text));
+}
+
+// ── Export / Import ───────────────────────────────────────────────────────────
+function exportJSON() {
+  if (!pearls.length) { toast('No pearls to export yet'); return; }
+  const json = JSON.stringify(pearls, null, 2);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([json], {type:'application/json'}));
+  a.download = 'hospitalist_helper_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+}
+
+function handleImport(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (!Array.isArray(imported)) throw new Error('Invalid format');
+      let added = 0;
+      imported.forEach(p => {
+        if (!pearls.find(x => x.title === p.title)) { pearls.push(p); added++; }
+      });
+      save(); updateCount(); renderKB();
+      toast('Imported ' + added + ' pearls');
+    } catch(err) { toast('Import failed — check file format'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+function parseJSON(text) {
+  try { return JSON.parse(text); } catch(e) {}
+  const s = text.replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
+  try { return JSON.parse(s); } catch(e) {}
+  const a = text.indexOf('['), b = text.lastIndexOf(']');
+  if (a !== -1 && b > a) { try { return JSON.parse(text.slice(a,b+1)); } catch(e) {} }
+  return null;
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  toast('Copied to clipboard');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+boot();
+</script>
+</body>
+</html>
