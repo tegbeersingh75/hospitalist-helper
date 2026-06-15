@@ -1002,7 +1002,7 @@ async function extractPearls() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-haiku-4-5',
         max_tokens: 2000,
         system: `You are a clinical knowledge organizer for an internal medicine hospitalist. Extract clinical pearls from notes and write them as the physician's own synthesized clinical knowledge. Return ONLY a raw JSON array, no markdown, no backticks, starting with [ and ending with ]. Each object must have: "title" (short memorable title), "body" (2-4 sentence synthesized pearl), "taxonomy_1" (System e.g. Cardiovascular), "taxonomy_2" (Category e.g. Heart Failure), "taxonomy_3" (Subcategory e.g. Acute Decompensated HF), "context" (one of: Diagnosis, Management, Monitoring, Boards Trap, Contraindication, Pharmacotherapy), "icd10" (most specific ICD-10 code), "hcc" (Yes — HCC X or No), "drg" (DRG info), "qualifying_criteria" (2-3 sentences on what Medicare/MA/commercial payers require to accept this code), "snippet" (paste-ready Epic note language with [brackets] for values), "orders" (comma-separated suggested orders), "priority" (high or normal), "date" (today YYYY-MM-DD). Extract 1-6 pearls.`,
         messages: [{ role: 'user', content: notes }]
