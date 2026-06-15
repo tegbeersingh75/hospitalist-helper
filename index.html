@@ -2,12 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#f5f5f0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hospitalist Helper</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -42,22 +38,16 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-body { -webkit-tap-highlight-color: rgba(0,0,0,0.04); }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; -webkit-font-smoothing: antialiased; }
 
 /* ── Layout ── */
 .shell { display: grid; grid-template-columns: 220px 1fr; grid-template-rows: 56px 1fr; height: 100vh; }
-.topbar { grid-column: 1/-1; display: flex; align-items: center; padding: 0 20px; background: var(--surface); border-bottom: 1px solid var(--border); gap: 12px; box-shadow: var(--shadow); z-index: 30; }
+.topbar { grid-column: 1/-1; display: flex; align-items: center; padding: 0 20px; background: var(--surface); border-bottom: 1px solid var(--border); gap: 12px; box-shadow: var(--shadow); z-index: 10; }
 .logo { font-family: var(--font-serif); font-size: 20px; color: var(--text); letter-spacing: -0.01em; }
 .logo span { color: var(--accent); font-style: italic; }
 .top-badge { font-size: 10px; background: var(--accent-bg); color: var(--accent); padding: 2px 8px; border-radius: 20px; font-weight: 500; border: 1px solid rgba(26,92,255,0.15); }
 .top-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 .pearl-total { font-size: 12px; color: var(--text3); font-family: var(--font-mono); }
-
-/* Mobile-only top controls — hidden on desktop */
-.menu-toggle, .more-menu-btn { display: none; background: none; border: none; cursor: pointer; padding: 6px; color: var(--text); align-items: center; justify-content: center; border-radius: var(--radius-sm); }
-.menu-toggle:hover, .more-menu-btn:hover { background: var(--surface2); }
-.menu-toggle svg, .more-menu-btn svg { display: block; }
 
 /* ── Sidebar ── */
 .sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 16px 0; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
@@ -72,18 +62,6 @@ body { -webkit-tap-highlight-color: rgba(0,0,0,0.04); }
 .filter-chip { display: block; width: 100%; text-align: left; padding: 5px 8px; border-radius: var(--radius-sm); border: none; background: transparent; font-family: var(--font); font-size: 12px; color: var(--text2); cursor: pointer; transition: all 0.1s; }
 .filter-chip:hover { background: var(--surface2); color: var(--text); }
 .filter-chip.active { background: var(--accent-bg); color: var(--accent); font-weight: 500; }
-
-/* Sidebar backdrop for mobile drawer */
-.sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 40; opacity: 0; transition: opacity 0.2s; }
-.sidebar-backdrop.show { display: block; opacity: 1; }
-
-/* ── Mobile dropdown menu (top-right actions) ── */
-.mobile-menu { display: none; position: fixed; top: 56px; right: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-md); z-index: 60; min-width: 220px; overflow: hidden; }
-.mobile-menu.show { display: block; }
-.mobile-menu-item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 14px 16px; background: none; border: none; border-bottom: 1px solid var(--border); font-family: var(--font); font-size: 14px; color: var(--text); cursor: pointer; }
-.mobile-menu-item:last-child { border-bottom: none; }
-.mobile-menu-item:hover, .mobile-menu-item:active { background: var(--surface2); }
-.mobile-menu-count { display: block; padding: 10px 16px; background: var(--surface2); font-size: 12px; color: var(--text3); font-family: var(--font-mono); border-bottom: 1px solid var(--border); }
 
 /* ── Main ── */
 .main { overflow: hidden; display: flex; flex-direction: column; }
@@ -120,7 +98,7 @@ input[type=text]::placeholder, textarea::placeholder { color: var(--text3); }
 .search-input { flex: 1; padding: 8px 12px; }
 
 /* ── Pearl grid ── */
-.pearl-scroll { flex: 1; overflow-y: auto; padding: 16px 24px; -webkit-overflow-scrolling: touch; }
+.pearl-scroll { flex: 1; overflow-y: auto; padding: 16px 24px; }
 .pearl-scroll::-webkit-scrollbar { width: 5px; }
 .pearl-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 .pearl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
@@ -150,22 +128,22 @@ input[type=text]::placeholder, textarea::placeholder { color: var(--text3); }
 /* ── Modal / Detail panel ── */
 .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
 .overlay.open { display: flex; }
-.modal { background: var(--surface); border-radius: var(--radius); width: 100%; max-width: 680px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.15); -webkit-overflow-scrolling: touch; }
+.modal { background: var(--surface); border-radius: var(--radius); width: 100%; max-width: 680px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
 .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
 .modal-title { font-family: var(--font-serif); font-size: 20px; line-height: 1.3; max-width: 540px; }
-.modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text3); padding: 0 8px; flex-shrink: 0; min-width: 36px; min-height: 36px; }
+.modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text3); padding: 0 4px; flex-shrink: 0; }
 .modal-close:hover { color: var(--text); }
 .modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 18px; }
 .detail-section { }
 .detail-label { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
 .detail-text { font-size: 13px; color: var(--text2); line-height: 1.7; }
-.snippet-box { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 12px; font-family: var(--font-mono); color: var(--text); line-height: 1.8; position: relative; word-break: break-word; }
-.copy-btn { position: absolute; top: 8px; right: 8px; padding: 5px 11px; border-radius: 4px; border: 1px solid var(--border2); background: var(--surface); font-size: 10px; font-family: var(--font); cursor: pointer; color: var(--text2); transition: all 0.12s; }
+.snippet-box { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 12px; font-family: var(--font-mono); color: var(--text); line-height: 1.8; position: relative; }
+.copy-btn { position: absolute; top: 8px; right: 8px; padding: 3px 9px; border-radius: 4px; border: 1px solid var(--border2); background: var(--surface); font-size: 10px; font-family: var(--font); cursor: pointer; color: var(--text2); transition: all 0.12s; }
 .copy-btn:hover { background: var(--green-bg); color: var(--green); border-color: var(--green); }
 .billing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .billing-cell { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; }
 .billing-cell-label { font-size: 10px; color: var(--text3); font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.06em; }
-.billing-cell-val { font-size: 13px; font-weight: 500; color: var(--text); font-family: var(--font-mono); word-break: break-word; }
+.billing-cell-val { font-size: 13px; font-weight: 500; color: var(--text); font-family: var(--font-mono); }
 .orders-text { font-size: 12px; color: var(--text2); line-height: 1.9; }
 
 /* ── Capture page ── */
@@ -175,9 +153,9 @@ input[type=text]::placeholder, textarea::placeholder { color: var(--text3); }
 .cap-header { flex-shrink: 0; padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; background: var(--surface); }
 .cap-label { font-size: 12px; font-weight: 500; color: var(--text2); }
 .cap-textarea { flex: 1; width: 100%; padding: 16px 20px; border: none; outline: none; resize: none; font-size: 14px; line-height: 1.8; color: var(--text); background: transparent; font-family: var(--font); }
-.cap-footer { flex-shrink: 0; padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: center; background: var(--surface); flex-wrap: wrap; }
+.cap-footer { flex-shrink: 0; padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: center; background: var(--surface); }
 .cap-source { padding: 6px 10px; border-radius: var(--radius-sm); font-size: 12px; }
-.pearls-preview { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
+.pearls-preview { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
 .preview-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 8px; color: var(--text3); font-size: 13px; text-align: center; padding: 32px; }
 .preview-empty-icon { font-size: 32px; margin-bottom: 4px; opacity: 0.4; }
 .preview-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
@@ -196,10 +174,10 @@ input[type=text]::placeholder, textarea::placeholder { color: var(--text3); }
 .ap-section-label { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; }
 .ap-input { width: 100%; padding: 8px 12px; }
 .ap-textarea { flex: 1; width: 100%; padding: 16px 20px; border: none; outline: none; resize: none; font-size: 13px; line-height: 1.85; color: var(--text); background: transparent; font-family: var(--font); min-height: 0; }
-.ap-footer { flex-shrink: 0; padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; background: var(--surface); flex-wrap: wrap; align-items: center; }
-.ap-output-header { flex-shrink: 0; padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--surface); gap: 8px; }
+.ap-footer { flex-shrink: 0; padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; background: var(--surface); }
+.ap-output-header { flex-shrink: 0; padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--surface); }
 .ap-output-label { font-size: 12px; font-weight: 500; color: var(--text2); }
-.ap-output-scroll { flex: 1; overflow-y: auto; padding: 0; -webkit-overflow-scrolling: touch; }
+.ap-output-scroll { flex: 1; overflow-y: auto; padding: 0; }
 .ap-output-text { padding: 20px; font-size: 13px; font-family: var(--font-mono); line-height: 1.9; color: var(--text); white-space: pre-wrap; word-break: break-word; }
 .ap-output-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 8px; color: var(--text3); font-size: 13px; text-align: center; padding: 32px; }
 .ap-output-empty-icon { font-size: 32px; opacity: 0.3; margin-bottom: 4px; }
@@ -210,7 +188,12 @@ input[type=text]::placeholder, textarea::placeholder { color: var(--text3); }
 .empty-sub { font-size: 13px; line-height: 1.8; max-width: 300px; }
 
 /* ── Toast ── */
-.toast { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: #fff; padding: 10px 18px; border-radius: var(--radius); font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 999; box-shadow: var(--shadow-md); }
+
+  /* Flashcard flip animation */
+  #flashCard { user-select: none; }
+  #flashCard:hover { border-color: var(--border2); box-shadow: var(--shadow-md); }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: #fff; padding: 10px 18px; border-radius: var(--radius); font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 999; box-shadow: var(--shadow-md); }
 .toast.show { opacity: 1; }
 
 /* ── API key modal ── */
@@ -223,234 +206,6 @@ input[type=text]::placeholder, textarea::placeholder { color: var(--text3); }
 
 /* ── Import banner ── */
 .import-bar { flex-shrink: 0; padding: 8px 24px; background: var(--amber-bg); border-bottom: 1px solid #f0d080; display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--amber); }
-
-/* ═══════════════════════════════════════════════════════════════
-   MOBILE — iPhone, narrow tablets (≤ 768px)
-   ═══════════════════════════════════════════════════════════════ */
-@media (max-width: 768px) {
-  html, body {
-    font-size: 15px;
-    overscroll-behavior-y: none;
-  }
-  body.drawer-open { overflow: hidden; }
-
-  /* Shell: single column, dynamic viewport for iOS browser chrome */
-  .shell {
-    grid-template-columns: 1fr;
-    grid-template-rows: 56px 1fr;
-    height: 100vh;
-    height: 100dvh;
-  }
-
-  /* Topbar tightened, safe-area aware */
-  .topbar {
-    padding: 0 12px;
-    padding-left: max(12px, env(safe-area-inset-left));
-    padding-right: max(12px, env(safe-area-inset-right));
-    gap: 8px;
-  }
-  .logo { font-size: 18px; }
-  .top-badge { display: none; }
-  .pearl-total { display: none; }
-  .top-right .btn-sm,
-  .top-right .btn-ghost { display: none; }
-  .menu-toggle, .more-menu-btn { display: inline-flex; }
-
-  /* Sidebar becomes slide-in drawer */
-  .sidebar {
-    position: fixed;
-    top: 56px;
-    left: 0;
-    bottom: 0;
-    width: 82%;
-    max-width: 300px;
-    z-index: 50;
-    transform: translateX(-100%);
-    transition: transform 0.25s ease;
-    box-shadow: 4px 0 24px rgba(0,0,0,0.12);
-    padding-bottom: env(safe-area-inset-bottom);
-    border-right: 1px solid var(--border);
-  }
-  .sidebar.open { transform: translateX(0); }
-
-  /* Larger filter chips for tappability */
-  .filter-chip { padding: 9px 10px; font-size: 13px; }
-  .nav-item { padding: 11px 16px; font-size: 14px; }
-
-  /* Page headers tightened */
-  .page-header {
-    padding: 14px 16px 12px;
-    padding-left: max(16px, env(safe-area-inset-left));
-    padding-right: max(16px, env(safe-area-inset-right));
-  }
-  .page-title { font-size: 20px; }
-  .page-sub { font-size: 12px; line-height: 1.5; }
-
-  /* All form inputs at 16px to prevent iOS auto-zoom on focus */
-  input[type=text], textarea, select,
-  .search-input, .ap-input, .cap-textarea, .ap-textarea, .apikey-input {
-    font-size: 16px;
-  }
-
-  /* Search bar — stack input and filter */
-  .search-wrap {
-    padding: 10px 16px;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .search-input { width: 100%; padding: 11px 14px; }
-  #priorityFilter {
-    width: 100%;
-    padding: 11px 12px !important;
-    font-size: 15px !important;
-    min-height: 42px;
-  }
-
-  /* Pearl scroll — single column, generous bottom padding for home indicator */
-  .pearl-scroll {
-    padding: 12px 16px;
-    padding-bottom: calc(24px + env(safe-area-inset-bottom));
-  }
-  .pearl-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  .pcard { padding: 14px 14px; }
-  .pcard:hover { transform: none; }
-  .pcard-title { font-size: 15px; }
-  .pcard-body { font-size: 13px; -webkit-line-clamp: 3; }
-  .badge { font-size: 11px; padding: 3px 9px; }
-
-  /* Bigger tap targets on buttons */
-  .btn {
-    padding: 11px 16px;
-    font-size: 14px;
-    min-height: 42px;
-  }
-  .btn-sm {
-    padding: 9px 13px;
-    font-size: 13px;
-    min-height: 38px;
-  }
-
-  /* Capture & A&P: stack vertically, allow scroll */
-  .capture-layout,
-  .ap-layout {
-    grid-template-columns: 1fr;
-    grid-auto-rows: min-content;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .capture-left, .ap-left {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-  .capture-left { min-height: 55vh; }
-  .capture-right { min-height: 50vh; }
-  .ap-left { min-height: 60vh; }
-  .ap-right { min-height: 50vh; }
-
-  .cap-header, .ap-section, .ap-output-header {
-    padding: 12px 16px;
-  }
-  .cap-textarea {
-    padding: 14px 16px;
-    line-height: 1.7;
-    min-height: 200px;
-  }
-  .ap-textarea {
-    padding: 14px 16px;
-    min-height: 220px;
-    line-height: 1.75;
-  }
-  .ap-input { padding: 11px 14px; }
-  .cap-footer, .ap-footer {
-    padding: 10px 16px;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom));
-  }
-  .ap-output-text {
-    padding: 16px;
-    font-size: 13px;
-    padding-bottom: calc(20px + env(safe-area-inset-bottom));
-  }
-
-  /* Make "Save all" / "Copy" buttons in headers wrap cleanly */
-  .cap-header { flex-wrap: wrap; gap: 10px; }
-  .cap-header #saveAllBtn { width: 100%; margin-left: 0 !important; }
-  .ap-output-header { flex-wrap: wrap; }
-
-  /* Modals become bottom sheets */
-  .overlay {
-    padding: 0;
-    align-items: flex-end;
-    justify-content: stretch;
-  }
-  .modal {
-    max-width: 100%;
-    max-height: 90vh;
-    max-height: 90dvh;
-    border-radius: 18px 18px 0 0;
-    width: 100%;
-    padding-bottom: env(safe-area-inset-bottom);
-    animation: slideUp 0.25s ease;
-  }
-  @keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-  }
-  .modal-header { padding: 18px 18px 14px; position: relative; }
-  .modal-header::before {
-    content: '';
-    position: absolute;
-    top: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 36px;
-    height: 4px;
-    background: var(--border2);
-    border-radius: 2px;
-  }
-  .modal-title { font-size: 18px; }
-  .modal-body { padding: 16px 18px 24px; gap: 16px; }
-  .modal-close { font-size: 28px; }
-  .billing-grid { grid-template-columns: 1fr; gap: 8px; }
-  .billing-cell { display: flex; align-items: baseline; gap: 12px; padding: 10px 12px; }
-  .billing-cell-label { margin-bottom: 0; flex-shrink: 0; min-width: 70px; }
-
-  /* API key modal — also bottom sheet */
-  .apikey-modal {
-    width: 100%;
-    max-width: 100%;
-    border-radius: 18px 18px 0 0;
-    padding: 22px 20px calc(22px + env(safe-area-inset-bottom));
-    animation: slideUp 0.25s ease;
-  }
-
-  /* Prevent body scroll while a bottom-sheet modal is open */
-  body:has(.overlay.open) { overflow: hidden; }
-
-  /* Toast — full-width banner at bottom */
-  .toast {
-    right: 16px;
-    left: 16px;
-    bottom: calc(20px + env(safe-area-inset-bottom));
-    text-align: center;
-    padding: 12px 16px;
-    font-size: 14px;
-  }
-
-  /* Top-right on mobile: tighter */
-  .top-right { gap: 2px; }
-}
-
-/* Very narrow phones — iPhone SE etc. */
-@media (max-width: 380px) {
-  .logo { font-size: 16px; }
-  .page-title { font-size: 18px; }
-  .page-header { padding: 12px 14px 10px; }
-  .search-wrap { padding: 10px 14px; }
-  .pearl-scroll { padding: 10px 14px; }
-}
 </style>
 </head>
 <body>
@@ -458,11 +213,6 @@ input[type=text]::placeholder, textarea::placeholder { color: var(--text3); }
 <div class="shell">
   <!-- Topbar -->
   <div class="topbar">
-    <!-- Mobile hamburger -->
-    <button class="menu-toggle" onclick="toggleDrawer()" aria-label="Open menu">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-
     <div class="logo">Hospitalist <span>Helper</span></div>
     <div class="top-badge">Personal</div>
     <div class="top-right">
@@ -470,18 +220,9 @@ input[type=text]::placeholder, textarea::placeholder { color: var(--text3); }
       <button class="btn btn-sm" onclick="exportJSON()">Export JSON</button>
       <button class="btn btn-sm" onclick="document.getElementById('importFile').click()">Import JSON</button>
       <button class="btn btn-sm btn-ghost" onclick="showApiKeyModal()">⚙ API Key</button>
-
-      <!-- Mobile "more" button -->
-      <button class="more-menu-btn" onclick="toggleMobileMenu(event)" aria-label="More options">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
-      </button>
-
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
     </div>
   </div>
-
-  <!-- Backdrop for mobile drawer -->
-  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeDrawer()"></div>
 
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
@@ -494,6 +235,9 @@ input[type=text]::placeholder, textarea::placeholder { color: var(--text3); }
     </div>
     <div class="nav-item" onclick="showPage('ap')" data-page="ap">
       <span class="nav-icon">◈</span> A&P Builder
+    </div>
+    <div class="nav-item" onclick="showPage('flash')" data-page="flash">
+      <span class="nav-icon">▣</span> Flashcards
     </div>
 
     <div class="nav-divider"></div>
@@ -521,14 +265,6 @@ input[type=text]::placeholder, textarea::placeholder { color: var(--text3); }
       <button class="filter-chip" onclick="setContextFilter(this,'Monitoring')">Monitoring</button>
       <button class="filter-chip" onclick="setContextFilter(this,'Pharmacotherapy')">Pharmacotherapy</button>
     </div>
-  </div>
-
-  <!-- Mobile dropdown menu -->
-  <div class="mobile-menu" id="mobileMenu">
-    <div class="mobile-menu-count" id="mobileMenuCount">0 pearls saved</div>
-    <button class="mobile-menu-item" onclick="exportJSON();closeMobileMenu();">📤 Export JSON</button>
-    <button class="mobile-menu-item" onclick="document.getElementById('importFile').click();closeMobileMenu();">📥 Import JSON</button>
-    <button class="mobile-menu-item" onclick="showApiKeyModal();closeMobileMenu();">⚙ API Key</button>
   </div>
 
   <!-- Main content -->
@@ -576,7 +312,7 @@ Write freely — no special format needed. After hitting Extract, your notes wil
             <button class="btn btn-ghost btn-sm" onclick="document.getElementById('captureNotes').value=''">Clear</button>
           </div>
         </div>
-        <div class="capture-right" id="captureRight">
+        <div class="capture-right">
           <div class="cap-header">
             <span class="cap-label">Extracted pearls</span>
             <button class="btn btn-sm btn-primary" id="saveAllBtn" style="display:none;margin-left:auto;" onclick="saveAllPearls()">Save all to knowledge base</button>
@@ -618,7 +354,7 @@ Write freely — no special format needed. After hitting Extract, your notes wil
             <button class="btn btn-ghost btn-sm" onclick="clearAP()">Clear</button>
           </div>
         </div>
-        <div class="ap-right" id="apRight">
+        <div class="ap-right">
           <div class="ap-output-header">
             <span class="ap-output-label">Generated Assessment & Plan</span>
             <div style="display:flex;gap:6px;">
@@ -637,6 +373,66 @@ Write freely — no special format needed. After hitting Extract, your notes wil
       </div>
     </div>
 
+
+    <!-- Flashcard page -->
+    <div class="page" id="page-flash">
+      <div class="page-header">
+        <div class="page-title">Flashcards</div>
+        <div class="page-sub" id="flashSub">Review your clinical pearls</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:20px;">
+        
+        <!-- Controls -->
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+          <select id="flashFilter" class="btn btn-sm" onchange="startFlash()" style="padding:5px 10px;">
+            <option value="all">All systems</option>
+            <option value="Cardiovascular">Cardiovascular</option>
+            <option value="Pulmonary">Pulmonary</option>
+            <option value="Renal">Renal</option>
+            <option value="Infectious Disease">Infectious Disease</option>
+            <option value="Endocrine & Metabolism">Endocrine</option>
+            <option value="Heme-Onc">Heme-Onc</option>
+            <option value="GI">GI</option>
+            <option value="Neurology">Neurology</option>
+          </select>
+          <button class="btn btn-sm" onclick="startFlash()">Shuffle & restart</button>
+          <span id="flashProgress" style="font-size:12px;color:var(--text3);font-family:var(--font-mono);"></span>
+        </div>
+
+        <!-- Card -->
+        <div id="flashCard" style="width:100%;max-width:600px;min-height:280px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px;text-align:center;transition:all 0.2s;" onclick="flipCard()">
+          <div id="flashEmpty" style="color:var(--text3);font-size:13px;">
+            <div style="font-size:28px;margin-bottom:12px;opacity:0.3;">▣</div>
+            No pearls yet — add some from Capture Notes first
+          </div>
+          <div id="flashFront" style="display:none;">
+            <div id="flashBC" style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-bottom:12px;"></div>
+            <div id="flashTitle" style="font-size:18px;font-weight:500;color:var(--text);line-height:1.4;"></div>
+            <div style="margin-top:20px;font-size:11px;color:var(--text3);">tap to reveal</div>
+          </div>
+          <div id="flashBack" style="display:none;">
+            <div id="flashBackBC" style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-bottom:10px;"></div>
+            <div id="flashBackTitle" style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:12px;"></div>
+            <div id="flashBody" style="font-size:13px;color:var(--text2);line-height:1.7;"></div>
+            <div id="flashBadges" style="margin-top:14px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;"></div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div id="flashBtns" style="display:none;flex-direction:row;gap:12px;">
+          <button class="btn" style="min-width:130px;border-color:#34d399;color:#1a7a4a;" onclick="knowIt()">✓ Know it</button>
+          <button class="btn" style="min-width:130px;border-color:#f87171;color:#c0392b;" onclick="reviewAgain()">↺ Review again</button>
+        </div>
+
+        <!-- Session summary -->
+        <div id="flashDone" style="display:none;text-align:center;">
+          <div style="font-family:var(--font-serif);font-size:24px;color:var(--text);margin-bottom:8px;font-style:italic;">Session complete</div>
+          <div id="flashScore" style="font-size:13px;color:var(--text2);margin-bottom:20px;"></div>
+          <button class="btn btn-primary" onclick="startFlash()">Start again</button>
+        </div>
+
+      </div>
+    </div>
   </div>
 </div>
 
@@ -704,25 +500,21 @@ Write freely — no special format needed. After hitting Extract, your notes wil
 
 const SUPABASE_URL = 'https://qevdopnwpaccvblorjlj.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFldmRvcG53cGFjY3ZibG9yamxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNjI1NzcsImV4cCI6MjA5MDczODU3N30.yjwFKkdWkqSWWJ8jFg4Ru_eGSjX7SXjlbGtq6-wyVTs';
-// Disable auth session machinery — this app doesn't use Supabase auth, and
-// the default BroadcastChannel/postMessage sync chokes on Headers objects
-// (Headers isn't in the structured-clone allowlist), throwing DataCloneError.
-// Also force native fetch to avoid cross-fetch quirks.
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-    detectSessionInUrl: false
-  },
-  global: {
-    fetch: (...args) => fetch(...args)
-  }
-});
+
+const SB_HEADERS = {
+  'Content-Type': 'application/json',
+  'apikey': SUPABASE_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_KEY
+};
 
 async function loadFromCloud() {
   try {
-    const { data, error } = await sb.from('pearls').select('*').order('date_added', { ascending: false });
-    if (error) throw error;
+    const res = await fetch(SUPABASE_URL + '/rest/v1/pearls?select=*&order=date_added.desc', {
+      method: 'GET',
+      headers: SB_HEADERS
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
     if (data && data.length) {
       pearls = data.map(r => ({
         title: r.title, body: r.body,
@@ -733,22 +525,27 @@ async function loadFromCloud() {
         db_id: r.id
       }));
       updateCount(); renderKB();
-      document.getElementById('emptyState') && (document.getElementById('emptyState').style.display = pearls.length ? 'none' : 'flex');
+      const empty = document.getElementById('emptyState');
+      if (empty) empty.style.display = pearls.length ? 'none' : 'flex';
     }
   } catch(e) { console.log('Cloud load failed, using local:', e.message); }
 }
 
 async function saveToCloud(pearl) {
   try {
-    const { error } = await sb.from('pearls').insert([{
-      title: pearl.title, body: pearl.body,
-      taxonomy_1: pearl.taxonomy_1, taxonomy_2: pearl.taxonomy_2, taxonomy_3: pearl.taxonomy_3,
-      context: pearl.context, icd10: pearl.icd10, hcc: pearl.hcc, drg: pearl.drg,
-      qualifying_criteria: pearl.qualifying_criteria, snippet: pearl.snippet,
-      orders: pearl.orders, priority: pearl.priority, source: pearl.source || 'Clinical Knowledge',
-      date_added: pearl.date || new Date().toISOString().slice(0,10)
-    }]);
-    if (error) throw error;
+    const res = await fetch(SUPABASE_URL + '/rest/v1/pearls', {
+      method: 'POST',
+      headers: { ...SB_HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify([{
+        title: pearl.title, body: pearl.body,
+        taxonomy_1: pearl.taxonomy_1, taxonomy_2: pearl.taxonomy_2, taxonomy_3: pearl.taxonomy_3,
+        context: pearl.context, icd10: pearl.icd10, hcc: pearl.hcc, drg: pearl.drg,
+        qualifying_criteria: pearl.qualifying_criteria, snippet: pearl.snippet,
+        orders: pearl.orders, priority: pearl.priority, source: pearl.source || 'Clinical Knowledge',
+        date_added: pearl.date || new Date().toISOString().slice(0,10)
+      }])
+    });
+    if (!res.ok) throw new Error(await res.text());
   } catch(e) { console.log('Cloud save failed:', e.message); }
 }
 
@@ -762,8 +559,12 @@ async function saveAllToCloud(pearlsList) {
       orders: p.orders, priority: p.priority, source: p.source || 'Clinical Knowledge',
       date_added: p.date || new Date().toISOString().slice(0,10)
     }));
-    const { error } = await sb.from('pearls').insert(rows);
-    if (error) throw error;
+    const res = await fetch(SUPABASE_URL + '/rest/v1/pearls', {
+      method: 'POST',
+      headers: { ...SB_HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify(rows)
+    });
+    if (!res.ok) throw new Error(await res.text());
   } catch(e) { console.log('Cloud save failed:', e.message); }
 }
 
@@ -774,17 +575,191 @@ let sysFilter = 'all';
 let ctxFilter = 'all';
 let previewPearls = [];
 
+
+// ── Save mode toggle ─────────────────────────────────────────────────────────
+let saveMode = 'kb';
+
+function setSaveMode(mode) {
+  saveMode = mode;
+  const kbBtn = document.getElementById('modeKB');
+  const fcBtn = document.getElementById('modeFC');
+  if (mode === 'kb') {
+    kbBtn.style.background = 'var(--accent)'; kbBtn.style.color = '#fff';
+    fcBtn.style.background = 'transparent'; fcBtn.style.color = 'var(--text2)';
+  } else {
+    fcBtn.style.background = 'var(--accent)'; fcBtn.style.color = '#fff';
+    kbBtn.style.background = 'transparent'; kbBtn.style.color = 'var(--text2)';
+  }
+}
+
+// ── Flashcard storage ─────────────────────────────────────────────────────────
+const FC_KEY = 'hh-flashcards-v1';
+let flashcards = [];
+
+function saveFlashcards() {
+  try { localStorage.setItem(FC_KEY, JSON.stringify(flashcards)); } catch(e) {}
+}
+
+function loadFlashcards() {
+  try {
+    const d = localStorage.getItem(FC_KEY);
+    if (d) flashcards = JSON.parse(d) || [];
+  } catch(e) { flashcards = []; }
+}
+
+async function saveFlashcardsToCloud(cards) {
+  try {
+    const rows = cards.map(c => ({
+      front: c.front, back: c.back,
+      topic: c.topic, priority: c.priority,
+      date_added: c.date || new Date().toISOString().slice(0,10)
+    }));
+    const res = await fetch(SUPABASE_URL + '/rest/v1/flashcards', {
+      method: 'POST',
+      headers: { ...SB_HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify(rows)
+    });
+    if (!res.ok) console.log('Flashcard cloud save failed:', await res.text());
+  } catch(e) { console.log('Flashcard cloud save error:', e.message); }
+}
+
+async function loadFlashcardsFromCloud() {
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/flashcards?select=*&order=date_added.desc', {
+      method: 'GET',
+      headers: SB_HEADERS
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && data.length) {
+      flashcards = data.map(r => ({
+        front: r.front, back: r.back,
+        topic: r.topic, priority: r.priority,
+        date: r.date_added, db_id: r.id
+      }));
+      saveFlashcards();
+    }
+  } catch(e) { console.log('Flashcard cloud load failed:', e.message); }
+}
+
+// ── Flashcards ────────────────────────────────────────────────────────────────
+let flashDeck = [];
+let flashIndex = 0;
+let flashKnown = 0;
+let flashReview = 0;
+let isFlipped = false;
+
+function startFlash() {
+  const filter = document.getElementById('flashFilter').value;
+  // Combine pearl-based cards and dedicated flashcards
+  const pearlCards = (filter === 'all' ? [...pearls] : pearls.filter(p => p.taxonomy_1 === filter))
+    .map(p => ({ front: p.title, back: p.body, topic: [p.taxonomy_1, p.taxonomy_2].filter(Boolean).join(' › '), priority: p.priority, icd10: p.icd10, context: p.context, _type: 'pearl' }));
+  const fcCards = flashcards.map(f => ({ ...f, _type: 'flashcard' }));
+  let deck = [...pearlCards, ...fcCards];
+  // Shuffle
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  flashDeck = deck;
+  flashIndex = 0;
+  flashKnown = 0;
+  flashReview = 0;
+  isFlipped = false;
+  document.getElementById('flashDone').style.display = 'none';
+  document.getElementById('flashBtns').style.display = 'none';
+  showFlashCard();
+}
+
+function showFlashCard() {
+  const empty = document.getElementById('flashEmpty');
+  const front = document.getElementById('flashFront');
+  const back = document.getElementById('flashBack');
+  const btns = document.getElementById('flashBtns');
+  const done = document.getElementById('flashDone');
+  const progress = document.getElementById('flashProgress');
+
+  if (!flashDeck.length) {
+    empty.style.display = 'block';
+    front.style.display = 'none';
+    back.style.display = 'none';
+    btns.style.display = 'none';
+    return;
+  }
+
+  if (flashIndex >= flashDeck.length) {
+    front.style.display = 'none';
+    back.style.display = 'none';
+    btns.style.display = 'none';
+    done.style.display = 'block';
+    document.getElementById('flashScore').textContent = 
+      `✓ Knew: ${flashKnown}   ↺ Review: ${flashReview}   Total: ${flashDeck.length}`;
+    progress.textContent = '';
+    return;
+  }
+
+  empty.style.display = 'none';
+  done.style.display = 'none';
+  isFlipped = false;
+
+  const p = flashDeck[flashIndex];
+
+  const cardFront = p.front || p.title || '';
+  const cardBack = p.back || p.body || '';
+  const cardTopic = p.topic || [p.taxonomy_1, p.taxonomy_2].filter(Boolean).join(' › ') || '';
+  document.getElementById('flashBC').textContent = cardTopic;
+  document.getElementById('flashTitle').textContent = cardFront;
+  document.getElementById('flashBackBC').textContent = cardTopic;
+  document.getElementById('flashBackTitle').textContent = cardFront;
+  document.getElementById('flashBody').textContent = cardBack;
+  document.getElementById('flashBadges').innerHTML = `
+    ${p.icd10 ? `<span class="badge b-icd">${p.icd10}</span>` : ''}
+    ${p.context ? `<span class="badge ${ctxBadgeClass(p.context)}">${p.context}</span>` : ''}
+    ${p.priority === 'high' ? '<span class="badge b-hi">high yield</span>' : ''}
+    ${p._type === 'flashcard' ? '<span class="badge b-src">flashcard</span>' : ''}
+  `;
+
+  front.style.display = 'block';
+  back.style.display = 'none';
+  btns.style.display = 'none';
+  progress.textContent = `${flashIndex + 1} / ${flashDeck.length}`;
+}
+
+function flipCard() {
+  if (!flashDeck.length || flashIndex >= flashDeck.length) return;
+  isFlipped = !isFlipped;
+  document.getElementById('flashFront').style.display = isFlipped ? 'none' : 'block';
+  document.getElementById('flashBack').style.display = isFlipped ? 'block' : 'none';
+  document.getElementById('flashBtns').style.display = isFlipped ? 'flex' : 'none';
+}
+
+function knowIt() {
+  flashKnown++;
+  flashIndex++;
+  showFlashCard();
+}
+
+function reviewAgain() {
+  flashReview++;
+  const card = flashDeck[flashIndex];
+  flashDeck.splice(flashIndex, 1);
+  flashDeck.push(card);
+  showFlashCard();
+}
+
 // ── Boot ──────────────────────────────────────────────────────────────────────
 function boot() {
   try {
     const d = localStorage.getItem(STORAGE_KEY);
     if (d) pearls = JSON.parse(d) || [];
   } catch(e) { pearls = []; }
+  loadFlashcards();
   updateCount();
   renderKB();
   const key = localStorage.getItem(APIKEY_KEY);
   if (key) document.getElementById('apikeyInput').value = key;
   loadFromCloud();
+  loadFlashcardsFromCloud();
 }
 
 function save() {
@@ -792,49 +767,8 @@ function save() {
 }
 
 function updateCount() {
-  const txt = pearls.length + (pearls.length===1?' pearl':' pearls') + ' saved';
-  document.getElementById('totalCount').textContent = txt;
-  const mc = document.getElementById('mobileMenuCount');
-  if (mc) mc.textContent = txt;
+  document.getElementById('totalCount').textContent = pearls.length + (pearls.length===1?' pearl':' pearls') + ' saved';
 }
-
-// ── Mobile drawer & menu ──────────────────────────────────────────────────────
-function isMobile() { return window.matchMedia('(max-width: 768px)').matches; }
-
-function toggleDrawer() {
-  const sb = document.getElementById('sidebar');
-  const bd = document.getElementById('sidebarBackdrop');
-  const open = sb.classList.toggle('open');
-  bd.classList.toggle('show', open);
-  document.body.classList.toggle('drawer-open', open);
-  closeMobileMenu();
-}
-
-function closeDrawer() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarBackdrop').classList.remove('show');
-  document.body.classList.remove('drawer-open');
-}
-
-function toggleMobileMenu(e) {
-  if (e) e.stopPropagation();
-  const m = document.getElementById('mobileMenu');
-  m.classList.toggle('show');
-  closeDrawer();
-}
-
-function closeMobileMenu() {
-  document.getElementById('mobileMenu').classList.remove('show');
-}
-
-// Close mobile menu when tapping outside
-document.addEventListener('click', (e) => {
-  const menu = document.getElementById('mobileMenu');
-  const btn = document.querySelector('.more-menu-btn');
-  if (menu && menu.classList.contains('show') && !menu.contains(e.target) && !btn.contains(e.target)) {
-    closeMobileMenu();
-  }
-});
 
 // ── Navigation ────────────────────────────────────────────────────────────────
 function showPage(page) {
@@ -842,7 +776,7 @@ function showPage(page) {
   document.querySelectorAll('.nav-item[data-page]').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   document.querySelector('.nav-item[data-page="' + page + '"]').classList.add('active');
-  if (isMobile()) closeDrawer();
+  if (page === 'flash') startFlash();
 }
 
 // ── Filters ───────────────────────────────────────────────────────────────────
@@ -995,16 +929,19 @@ async function extractPearls() {
   btn.style.display = 'none';
   loader.classList.add('show');
 
+  const isFlashMode = saveMode === 'flash';
+  const systemPrompt = isFlashMode
+    ? `You are a flashcard creator for an internal medicine physician. Convert clinical notes into concise flashcards for active recall studying. Return ONLY a raw JSON array, no markdown, no backticks, starting with [ and ending with ]. Each object must have exactly: "front" (1-2 sentence clinical scenario or question that prompts recall — write it as a clinical vignette or key question, not just a title), "back" (the concise answer or key teaching point in 2-3 sentences — include why wrong answers are wrong if relevant), "topic" (short topic label e.g. "HFpEF Management"), "priority" ("high" or "normal"), "date" (today YYYY-MM-DD). Extract 1-6 flashcards.`
+    : `You are a clinical knowledge organizer for an internal medicine hospitalist. Extract clinical pearls from notes and write them as the physician's own synthesized clinical knowledge. Return ONLY a raw JSON array, no markdown, no backticks, starting with [ and ending with ]. Each object must have: "title" (short memorable title), "body" (2-4 sentence synthesized pearl), "taxonomy_1" (System e.g. Cardiovascular), "taxonomy_2" (Category e.g. Heart Failure), "taxonomy_3" (Subcategory e.g. Acute Decompensated HF), "context" (one of: Diagnosis, Management, Monitoring, Boards Trap, Contraindication, Pharmacotherapy), "icd10" (most specific ICD-10 code), "hcc" (Yes — HCC X or No), "drg" (DRG info), "qualifying_criteria" (2-3 sentences on what Medicare/MA/commercial payers require to accept this code), "snippet" (paste-ready Epic note language with [brackets] for values), "orders" (comma-separated suggested orders), "priority" (high or normal), "date" (today YYYY-MM-DD). Extract 1-6 pearls.`;
+
   try {
     const res = await fetch('/.netlify/functions/claude', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 2000,
-        system: `You are a clinical knowledge organizer for an internal medicine hospitalist. Extract clinical pearls from notes and write them as the physician's own synthesized clinical knowledge. Return ONLY a raw JSON array, no markdown, no backticks, starting with [ and ending with ]. Each object must have: "title" (short memorable title), "body" (2-4 sentence synthesized pearl), "taxonomy_1" (System e.g. Cardiovascular), "taxonomy_2" (Category e.g. Heart Failure), "taxonomy_3" (Subcategory e.g. Acute Decompensated HF), "context" (one of: Diagnosis, Management, Monitoring, Boards Trap, Contraindication, Pharmacotherapy), "icd10" (most specific ICD-10 code), "hcc" (Yes — HCC X or No), "drg" (DRG info), "qualifying_criteria" (2-3 sentences on what Medicare/MA/commercial payers require to accept this code), "snippet" (paste-ready Epic note language with [brackets] for values), "orders" (comma-separated suggested orders), "priority" (high or normal), "date" (today YYYY-MM-DD). Extract 1-6 pearls.`,
+        system: systemPrompt,
         messages: [{ role: 'user', content: notes }]
       })
     });
@@ -1016,19 +953,16 @@ async function extractPearls() {
 
     const data = await res.json();
     const raw = (data.content||[]).map(i=>i.text||'').join('').trim();
+    console.log('Raw API response:', raw.slice(0, 500));
     previewPearls = parseJSON(raw);
-    if (!previewPearls || !previewPearls.length) throw new Error('Could not parse response');
+    if (!previewPearls || !previewPearls.length) {
+      console.error('Full raw response:', raw);
+      throw new Error('Parse failed. Raw: ' + raw.slice(0, 200));
+    }
 
     renderPreview();
     document.getElementById('saveAllBtn').style.display = '';
     document.getElementById('previewEmpty').style.display = 'none';
-
-    // On mobile, scroll to the extracted pearls so user sees them
-    if (isMobile()) {
-      setTimeout(() => {
-        document.getElementById('captureRight').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
 
   } catch(e) {
     toast('Error: ' + e.message);
@@ -1038,42 +972,6 @@ async function extractPearls() {
   loader.classList.remove('show');
 }
 
-function renderPreview() {
-  const container = document.getElementById('pearlsPreview');
-  container.querySelectorAll('.preview-card').forEach(c=>c.remove());
-  previewPearls.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'preview-card';
-    const bc = [p.taxonomy_1,p.taxonomy_2,p.taxonomy_3].filter(Boolean).join(' › ');
-    card.innerHTML = `
-      <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-bottom:4px;">${bc}</div>
-      <div class="preview-card-title">${p.title||''}</div>
-      <div class="preview-card-body">${p.body||''}</div>
-      <div class="badges">
-        ${p.icd10?`<span class="badge b-icd">${p.icd10}</span>`:''}
-        ${p.context?`<span class="badge ${ctxBadgeClass(p.context)}">${p.context}</span>`:''}
-        ${p.priority==='high'?'<span class="badge b-hi">high yield</span>':''}
-      </div>`;
-    container.appendChild(card);
-  });
-}
-
-function saveAllPearls() {
-  if (!previewPearls.length) return;
-  previewPearls.forEach(p => pearls.push(p));
-  save();
-  updateCount();
-  renderKB();
-  saveAllToCloud(previewPearls);
-  toast(previewPearls.length + ' pearl' + (previewPearls.length===1?'':'s') + ' saved to knowledge base');
-  previewPearls = [];
-  document.getElementById('pearlsPreview').querySelectorAll('.preview-card').forEach(c=>c.remove());
-  document.getElementById('previewEmpty').style.display = 'flex';
-  document.getElementById('saveAllBtn').style.display = 'none';
-  document.getElementById('captureNotes').value = '';
-}
-
-// ── A&P Builder ───────────────────────────────────────────────────────────────
 async function generateAP() {
   const oneliner  = document.getElementById('apOneliner').value.trim();
   const problems  = document.getElementById('apProblems').value.trim();
@@ -1134,13 +1032,6 @@ Be concise, practical, and structured. Think like a senior academic hospitalist.
     document.getElementById('apEmpty').style.display = 'none';
     document.getElementById('copyApBtn').style.display = '';
 
-    // On mobile, scroll to the generated output
-    if (isMobile()) {
-      setTimeout(() => {
-        document.getElementById('apRight').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
-
   } catch(e) {
     toast('Error: ' + e.message);
   }
@@ -1195,11 +1086,18 @@ function handleImport(e) {
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 function parseJSON(text) {
+  if (!text) return null;
+  // Direct parse
   try { return JSON.parse(text); } catch(e) {}
+  // Strip markdown fences
   const s = text.replace(/^```(?:json)?\s*/i,'').replace(/\s*```\s*$/,'').trim();
   try { return JSON.parse(s); } catch(e) {}
+  // Find JSON array
   const a = text.indexOf('['), b = text.lastIndexOf(']');
   if (a !== -1 && b > a) { try { return JSON.parse(text.slice(a,b+1)); } catch(e) {} }
+  // Find JSON object and wrap in array
+  const c = text.indexOf('{'), d = text.lastIndexOf('}');
+  if (c !== -1 && d > c) { try { return [JSON.parse(text.slice(c,d+1))]; } catch(e) {} }
   return null;
 }
 
@@ -1221,6 +1119,61 @@ function toast(msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
 }
+
+// ── Render preview ───────────────────────────────────────────────────────────
+function renderPreview() {
+  const container = document.getElementById('pearlsPreview');
+  container.querySelectorAll('.preview-card').forEach(c=>c.remove());
+  previewPearls.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'preview-card';
+    const isFlash = p.front !== undefined;
+    if (isFlash) {
+      card.innerHTML = `
+        <div style="font-size:10px;color:var(--accent);font-family:var(--font-mono);margin-bottom:4px;">FLASHCARD · ${p.topic||''}</div>
+        <div class="preview-card-title">${p.front||''}</div>
+        <div class="preview-card-body" style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px;">${p.back||''}</div>
+        <div class="badges" style="margin-top:6px;">${p.priority==='high'?'<span class="badge b-hi">high yield</span>':''}</div>`;
+    } else {
+      const bc = [p.taxonomy_1,p.taxonomy_2,p.taxonomy_3].filter(Boolean).join(' › ');
+      card.innerHTML = `
+        <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-bottom:4px;">${bc}</div>
+        <div class="preview-card-title">${p.title||''}</div>
+        <div class="preview-card-body">${p.body||''}</div>
+        <div class="badges">
+          ${p.icd10?`<span class="badge b-icd">${p.icd10}</span>`:''}
+          ${p.context?`<span class="badge ${ctxBadgeClass(p.context)}">${p.context}</span>`:''}
+          ${p.priority==='high'?'<span class="badge b-hi">high yield</span>':''}
+        </div>`;
+    }
+    container.appendChild(card);
+  });
+}
+
+// ── Save all pearls/flashcards ────────────────────────────────────────────────
+function saveAllPearls() {
+  if (!previewPearls.length) return;
+  const isFlash = previewPearls[0].front !== undefined;
+  if (isFlash) {
+    previewPearls.forEach(f => flashcards.push(f));
+    saveFlashcards();
+    saveFlashcardsToCloud(previewPearls);
+    toast(previewPearls.length + ' flashcard' + (previewPearls.length===1?'':'s') + ' saved');
+  } else {
+    previewPearls.forEach(p => pearls.push(p));
+    save();
+    updateCount();
+    renderKB();
+    saveAllToCloud(previewPearls);
+    toast(previewPearls.length + ' pearl' + (previewPearls.length===1?'':'s') + ' saved to knowledge base');
+  }
+  previewPearls = [];
+  document.getElementById('pearlsPreview').querySelectorAll('.preview-card').forEach(c=>c.remove());
+  document.getElementById('previewEmpty').style.display = 'flex';
+  document.getElementById('saveAllBtn').style.display = 'none';
+  document.getElementById('captureNotes').value = '';
+}
+
 
 boot();
 </script>
